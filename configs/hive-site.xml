@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+    <property>
+        <name>hive.metastore.pre.event.listeners</name>
+        <value>org.apache.carbondata.hive.CarbonHiveMetastoreListener</value>
+    </property>
+    <property>
+        <name>hive.metastore.warehouse.dir</name>
+        <value>s3a://dora.data.la/warehouse</value>
+        <description>Hive Metastore location</description>
+    </property>
+</configuration>

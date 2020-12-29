@@ -5,34 +5,18 @@ LABEL   maintainer="didone@live.com"\
         python2="2.7"\
         python3="3.7"\
         jdk="1.8"
-ARG SPARK_REPO="https://archive.apache.org/dist/spark/spark-2.4.5/spark-2.4.5-bin-hadoop2.7.tgz"
-ARG MAVEN_REPO="https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz"
-ARG THRIFT_REPO="http://archive.apache.org/dist/thrift/0.9.3/thrift-0.9.3.tar.gz"
-ENV SPARK_HOME="/usr/local/spark"\
-    MAVEN_HOME="/usr/local/maven"\
-    THRIFT_HOME="/usr/local/thrift"
+ENV SPARK_HOME="/usr/local/spark"
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install curl wget -y && \
+    apt-get install python3 python3-pip -y && \
+    update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
+RUN curl --retry 3 "https://archive.apache.org/dist/spark/spark-2.3.4/spark-2.3.4-bin-hadoop2.7.tgz" | gunzip | tar -x -C /usr/local/ && \
+    ln -s /usr/local/spark-2.3.4-bin-hadoop2.7 ${SPARK_HOME}
+RUN wget --quiet "https://archive.apache.org/dist/carbondata/2.1.0/apache-carbondata-2.1.0-bin-spark2.3.4-hadoop2.7.2.jar" -O ${SPARK_HOME}/apache-carbondata.jar && \
+    wget --quiet "https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk/1.7.4.2/aws-java-sdk-1.7.4.2.jar" -O ${SPARK_HOME}/jars/aws-java-sdk.jar && \
+    wget --quiet "https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/2.7.2/hadoop-aws-2.7.2.jar" -O ${SPARK_HOME}/jars/hadoop-aws.jar && \
+    wget --quiet "https://repo1.maven.org/maven2/com/databricks/spark-avro_2.11/4.0.0/spark-avro_2.11-4.0.0.jar" -O ${SPARK_HOME}/jars/spark-avro_2.jar
+ADD configs/*.* ${SPARK_HOME}/conf/
 ENV SPARK_CONF_DIR=${SPARK_HOME}/conf\
-    PATH=$PATH:${SPARK_HOME}/bin:${MAVEN_HOME}/bin
-RUN apt-get update && apt-get upgrade -y &&\
-    apt-get install curl wget -y &&\
-    apt-get install python3 python3-pip -y &&\
-    curl --retry 3 "${SPARK_REPO}" | gunzip | tar -x -C /usr/local/ &&\
-    ln -s /usr/local/spark-2.4.5-bin-hadoop2.7 ${SPARK_HOME} &&\
-    curl --retry 3 "${MAVEN_REPO}" | gunzip | tar -x -C /usr/local/ &&\
-    ln -s /usr/local/apache-maven-3.6.3 ${MAVEN_HOME} &&\
-    curl --retry 3 "${THRIFT_REPO}" | gunzip | tar -x -C /usr/local/ &&\
-    cd /usr/local/thrift-0.9.3 &&\
-    ./configure && make &&\
-    make install
-WORKDIR /usr/local/carbondata
-RUN git clone https://github.com/apache/carbondata.git /usr/local/ &&\
-    ./build/carbondata-build-info.sh 2.0.1 &&\
-    mvn -DskipTests -Pspark-2.4.5 clean package &&\
-    mkdir -p $SPARK_HOME/carbonlib &&\
-    cp assembly/target/scala-2.11/apache-carbondata-2.1.1*.jar $SPARK_HOME/carbonlib
-# RUN conf/carbon.properties.template $SPARK_HOME/conf/carbon.properties
-# RUN cp $SPARK_HOME/conf/spark-defaults.conf.template $SPARK_HOME/conf/spark-defaults.conf
-# RUN echo "spark.driver.extraJavaOptions -Dcarbon.properties.filepath = $SPARK_HOME/conf/carbon.properties"   >> $SPARK_HOME/conf/spark-defaults.conf
-# RUN echo "spark.executor.extraJavaOptions -Dcarbon.properties.filepath = $SPARK_HOME/conf/carbon.properties" >> $SPARK_HOME/conf/spark-defaults.conf
-# RUN cp $SPARK_HOME/conf/spark-env.sh.template $SPARK_HOME/conf/spark-env.sh
-# RUN echo "SPARK_CLASSPATH=$SPARK_HOME/carbonlib/*" >> $SPARK_HOME/conf/spark-env.sh
+    PATH=$PATH:${SPARK_HOME}/bin
+WORKDIR $SPARK_HOME
