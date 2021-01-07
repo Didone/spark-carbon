@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+	<property>
+		<name>hive.metastore.pre.event.listeners</name>
+		<value>org.apache.carbondata.hive.CarbonHiveMetastoreListener</value>
+	</property>
+    <property>
+        <description>Enter your JDBC connection string.</description>
+        <name>javax.jdo.option.ConnectionURL</name>
+        <value>jdbc:postgresql://HIVE_HOST:5432/postgres</value>
+    </property>
+    <property>
+        <description>JDBC Connection Driver Name.</description>
+        <name>javax.jdo.option.ConnectionDriverName</name>
+        <value>org.postgresql.Driver</value>
+    </property>
+    <property>
+        <description>Enter your PostgreSQL credentials. </description>
+        <name>javax.jdo.option.ConnectionUserName</name>
+        <value>HIVE_USER</value>
+    </property>
+    <property>
+        <description>Enter your PostgreSQL credentials. </description>
+        <name>javax.jdo.option.ConnectionPassword</name>
+        <value>HIVE_PASS</value>
+    </property>
+    <property>
+        <name>datanucleus.autoCreateSchema</name>
+        <value>true</value>
+    </property>
+</configuration>
+
