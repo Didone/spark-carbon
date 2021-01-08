@@ -5,9 +5,10 @@ LABEL   maintainer="didone@live.com"\
         python3="3.7"\
         jdk="1.8"
 ENV SPARK_HOME="/usr/local/spark"
-RUN apt-get update && apt-get upgrade -y && \
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
+    apt-get update && apt-get upgrade -y && \
     apt-get install curl wget -y && \
-    apt-get install python3 python3-pip python3-pandas nodejs npm -y && \
+    apt-get install python3 python3-pip python3-pandas nodejs -y && \
     update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
 RUN curl --retry 3 "https://archive.apache.org/dist/spark/spark-2.3.4/spark-2.3.4-bin-hadoop2.7.tgz" | gunzip | tar -x -C /usr/local/ && \
     ln -s /usr/local/spark-2.3.4-bin-hadoop2.7 ${SPARK_HOME}
@@ -21,7 +22,7 @@ RUN wget --quiet "https://archive.apache.org/dist/carbondata/2.1.0/apache-carbon
     -O ${SPARK_HOME}/jars/postgresql.jar && \
     wget --quiet "https://repo1.maven.org/maven2/com/databricks/spark-avro_2.11/4.0.0/spark-avro_2.11-4.0.0.jar" \
     -O ${SPARK_HOME}/jars/spark-avro_2.jar
-RUN pip3 install -U jupyterlab==3.0.1
+RUN pip3 install -U jupyterlab==3.0.0
 ADD configs/*.* ${SPARK_HOME}/conf/
 ENV SPARK_CONF_DIR=${SPARK_HOME}/conf\
     PATH=$PATH:${SPARK_HOME}/bin\
